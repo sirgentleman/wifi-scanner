@@ -2,22 +2,29 @@
 #include <python3.8/Python.h>
 #include <ifaddrs.h>
 #include <stdio.h>
-
-#define DEBUG 1
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 static PyObject*
 get_interfaces(PyObject *self) {
     
-    struct ifaddrs *ifaddrs, *ifa;
+    struct ifaddrs *ifaddr = NULL, *ifa = NULL;
     PyObject *returnList = PyList_New(0);
+    if(getifaddrs(&ifaddr) == -1)
+        perror("ERROR");
 
-    if(getifaddrs(&ifaddrs) == -1)
-        printf("%s", "ERROR");
+    int iterations = 0;
+    for(ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if(ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET) {
+            void *tmpAddrPtr = &((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr;
 
-    for(ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
-        PyList_Append(returnList, Py_BuildValue("[s:s, s:s]", "name", ifa->ifa_name, "netmask", ifa->ifa_netmask->sa_data));
+            char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+            PyList_Append(returnList, Py_BuildValue("[s:s] [s:s]", "name", ifa->ifa_name, "address", addressBuffer));
+        }
     }
 
+    freeifaddrs(ifaddr);
     return returnList;
 }
 
@@ -25,12 +32,19 @@ static char nettoolbox_docs[] =
    "get_interfaces( ): Used to extract network interfaces.\n";
 
 static PyMethodDef nettoolbox_funcs[] = {
-   {"helloworld", (PyCFunction)get_interfaces, 
+   {"get_interfaces", (PyCFunction)get_interfaces, 
       METH_NOARGS, nettoolbox_docs},
       {NULL}
 };
 
-void inithelloworld(void) {
-   Py_InitModule3("nettoolbox", nettoolbox_funcs,
-                  "Helper module to play with local network informations");
+static struct PyModuleDef Nettoolbox = {
+    PyModuleDef_HEAD_INIT,
+    "nettoolbox",
+    "Usage: helper module to play with local network informations",
+    -1,
+    nettoolbox_funcs
+};
+
+PyMODINIT_FUNC PyInit_nettoolbox(void) {
+    return PyModule_Create(&Nettoolbox);
 }
