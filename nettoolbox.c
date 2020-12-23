@@ -20,7 +20,11 @@ get_interfaces(PyObject *self) {
 
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-            PyList_Append(returnList, Py_BuildValue("[s:s] [s:s]", "name", ifa->ifa_name, "address", addressBuffer));
+            
+            tmpAddrPtr = &((struct sockaddr_in *)(ifa->ifa_netmask))->sin_addr;
+            char maskBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, maskBuffer, INET_ADDRSTRLEN);
+            PyList_Append(returnList, Py_BuildValue("[s:s] [s:s] [s:s]", "name", ifa->ifa_name, "address", addressBuffer, "mask", maskBuffer));
         }
     }
 
