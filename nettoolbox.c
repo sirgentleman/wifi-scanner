@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <net/if.h>
 
 static PyObject*
 get_interfaces(PyObject *self) {
@@ -13,9 +14,11 @@ get_interfaces(PyObject *self) {
     if(getifaddrs(&ifaddr) == -1)
         perror("ERROR");
 
-    int iterations = 0;
     for(ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
         if(ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET) {
+            if((ifa->ifa_flags & IFF_LOOPBACK) != 0 || (ifa->ifa_flags & IFF_UP) == 0)
+                continue;
+
             void *tmpAddrPtr = &((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr;
 
             char addressBuffer[INET_ADDRSTRLEN];
