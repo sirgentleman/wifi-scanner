@@ -4,29 +4,42 @@ import subprocess
 import nettoolbox as ntb
 import re
 
-mask_regex = "^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]){1}(\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])){3}$"
+
+
+class NetworkAddr:
+
+    _ip_regex = "^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]){1}(\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])){3}$"
+
+    def __init__(self, ip_addr):
+        assert(re.search(self._ip_regex, ip_addr)), "Address should be in decimal format!"
+        self.octets =  list(map(int, ip_addr.split('.')))
+
+    def __str__(self):
+        result = ""
+        for i in range(4):
+            result += str(self.octets[i])
+            if(i != 3):
+                result += '.'
+        return result
+
 
 # mask as string
 def get_device_amount(mask):
     
-    assert(re.search(mask_regex, mask)), "Mask should be in decimal format!"
-        
+    addr = NetworkAddr(mask)    
 
-    octets = mask.split('.')
-
-    parts = list(map(int, octets))
-    final_amount = ((parts[0] ^ 255) << 12) | ((parts[1] ^ 255) << 8) | ((parts[2] ^ 255) << 4) | (parts[3] ^ 255)
+    final_amount = ((addr.octets[0] ^ 255) << 12) | ((addr.octets[1] ^ 255) << 8) | ((addr.octets[2] ^ 255) << 4) | (addr.octets[3] ^ 255)
 
     return final_amount - 1
 
 def get_network_address(machine_ip, mask):
 
-    machine_ip_octets = list(map(int, machine_ip.split('.')))
-    mask_octets = list(map(int, mask.split('.')))
+    machine_addr = NetworkAddr(machine_ip)
+    mask_addr = NetworkAddr(mask)
 
     result = ""
     for i in range(4):
-        result += str(machine_ip_octets[i] & mask_octets[i])
+        result += str(machine_addr.octets[i] & mask_addr.octets[i])
         if(i != 3):
             result += '.'
 
@@ -37,3 +50,7 @@ def ping_host(ip_addr, retries):
     command = ['ping', '-q', '-c', str(retries), str(ip_addr)]
 
     return subprocess.call(command) == 0
+
+def ping_network(network_ip, network_mask='255.255.255.0'):
+
+    device_amount = get_device_amount(network_mask)
