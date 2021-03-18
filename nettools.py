@@ -1,5 +1,6 @@
 #! .venv/bin/python3
 
+import subprocess
 import nettoolbox as ntb
 import re
 
@@ -31,4 +32,8 @@ def get_network_address(machine_ip, mask):
 
     return result
 
+def ping_host(ip_addr, retries):
 
+    command = ['ping', '-q', '-c', str(retries), str(ip_addr)]
+
+    return subprocess.call(command) == 0
