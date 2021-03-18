@@ -4,7 +4,7 @@ import subprocess
 import nettoolbox as ntb
 import re
 import concurrent.futures
-
+import itertools
 
 class NetworkAddr:
 
@@ -19,6 +19,8 @@ class NetworkAddr:
         self._binary += 1
         for i in range(4):
             self.octets[3-i] = (self._binary & (255 << i*8)) >> i*8
+        
+        return str(self)
 
     def __str__(self):
         result = ""
@@ -51,8 +53,15 @@ def get_network_address(machine_ip, mask):
 
     return result
 
-def ping_host(ip_addr, retries):
-
+def ping_host(ip_addr, retries=1):
     command = ['ping', '-q', '-c', str(retries), str(ip_addr)]
 
     return subprocess.call(command) == 0
+
+def ping_network(network_ip, network_mask="255.255.255.0"):
+    device_amount = get_device_amount(network_mask)
+    network_addr = NetworkAddr(network_ip)
+
+    args = ((network_addr.increment(), 3) for _ in range(device_amount))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=device_amount) as executor:
+        executor.map(lambda p: ping_host(*p), args)
