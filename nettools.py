@@ -3,7 +3,7 @@
 import subprocess
 import nettoolbox as ntb
 import re
-
+import concurrent.futures
 
 
 class NetworkAddr:
@@ -13,6 +13,12 @@ class NetworkAddr:
     def __init__(self, ip_addr):
         assert(re.search(self._ip_regex, ip_addr)), "Address should be in decimal format!"
         self.octets =  list(map(int, ip_addr.split('.')))
+        self._binary = (self.octets[0] << 24) | (self.octets[1] << 16) | (self.octets[2] << 8) | self.octets[3]
+
+    def increment(self):
+        self._binary += 1
+        for i in range(4):
+            self.octets[3-i] = (self._binary & (255 << i*8)) >> i*8
 
     def __str__(self):
         result = ""
@@ -50,7 +56,3 @@ def ping_host(ip_addr, retries):
     command = ['ping', '-q', '-c', str(retries), str(ip_addr)]
 
     return subprocess.call(command) == 0
-
-def ping_network(network_ip, network_mask='255.255.255.0'):
-
-    device_amount = get_device_amount(network_mask)
