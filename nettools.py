@@ -18,3 +18,17 @@ def get_device_amount(mask):
 
     return final_amount - 1
 
+def get_network_address(machine_ip, mask):
+
+    machine_ip_octets = list(map(int, machine_ip.split('.')))
+    mask_octets = list(map(int, mask.split('.')))
+
+    result = ""
+    for i in range(4):
+        result += str(machine_ip_octets[i] & mask_octets[i])
+        if(i != 3):
+            result += '.'
+
+    return result
+
+

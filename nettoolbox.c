@@ -1,5 +1,5 @@
 #define PY_SSIZE_T_CLEAN
-#include <python3.8/Python.h>
+#include <python3.9/Python.h>
 #include <ifaddrs.h>
 #include <stdio.h>
 #include <netinet/in.h>
