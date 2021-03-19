@@ -5,6 +5,7 @@ import nettoolbox as ntb
 import re
 import concurrent.futures
 import itertools
+import os
 
 class NetworkAddr:
 
@@ -55,8 +56,12 @@ def get_network_address(machine_ip, mask):
 
 def ping_host(ip_addr, retries=1):
     command = ['ping', '-q', '-c', str(retries), str(ip_addr)]
+    result = None
 
-    return subprocess.call(command) == 0
+    with open(os.devnull, "w") as f:
+        result = subprocess.call(command, stdout=f)
+
+    return result == 0
 
 def ping_network(network_ip, network_mask="255.255.255.0"):
     device_amount = get_device_amount(network_mask)
