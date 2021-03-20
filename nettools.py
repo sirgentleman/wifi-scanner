@@ -41,7 +41,7 @@ def get_device_amount(mask):
 
     return final_amount - 1
 
-def get_network_address(machine_ip, mask):
+def get_network_address(machine_ip, mask="255.255.255.0"):
 
     machine_addr = NetworkAddr(machine_ip)
     mask_addr = NetworkAddr(mask)
@@ -78,7 +78,9 @@ def retrieve_devices_info():
 
     arp_entries = []
     for entry in out.decode().split('\n'):
-        arp_entries.append(entry.split(' '))
+        entry_arr = entry.split(' ')
+        if len(entry_arr) == 5
+            arp_entries.append(entry_arr))
     
     arp_entries.pop(0)
     return arp_entries
