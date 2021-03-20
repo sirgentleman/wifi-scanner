@@ -70,3 +70,16 @@ def ping_network(network_ip, network_mask="255.255.255.0"):
     args = ((network_addr.increment(), 3) for _ in range(device_amount))
     with concurrent.futures.ThreadPoolExecutor(max_workers=device_amount) as executor:
         executor.map(lambda p: ping_host(*p), args)
+
+def retrieve_devices_info():
+
+    pipe = subprocess.Popen(["arp", "-n"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = pipe.communicate()
+
+    arp_entries = []
+    for entry in out.decode().split('\n'):
+        arp_entries.append(entry.split(' '))
+    
+    arp_entries.pop(0)
+    return arp_entries
+
