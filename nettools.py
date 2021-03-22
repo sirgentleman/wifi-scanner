@@ -2,10 +2,12 @@
 
 import subprocess
 import nettoolbox as ntb
+import utils
 import re
 import concurrent.futures
 import itertools
 import os
+from datetime import datetime
 
 class NetworkAddr:
 
@@ -78,10 +80,22 @@ def retrieve_devices_info():
 
     arp_entries = []
     for entry in out.decode().split('\n'):
-        entry_arr = entry.split(' ')
-        if len(entry_arr) == 5
-            arp_entries.append(entry_arr))
+        entry_arr = entry.split()
+        if len(entry_arr) == 5:
+            if entry_arr[2] in map(lambda x: x[2], arp_entries):
+                continue
+            arp_entries.append(entry_arr)
     
     arp_entries.pop(0)
     return arp_entries
 
+def get_connected_devices(machine_ip, mask="255.255.255.0"):
+    
+    ping_network(get_network_address(machine_ip, mask), mask)
+
+    return_devices = []
+
+    for entry in retrieve_devices_info():
+        return_devices.append({"ip" : entry[0], "mac" : entry[2], "mac_vendor" : utils.get_vendor(entry[2]), "timestamp" : datetime.now().ctime()})
+    
+    return return_devices
