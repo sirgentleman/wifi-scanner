@@ -25,19 +25,23 @@ class NetworkState:
                 self.device_map.append(row)
 
     def scan(self):
-        self.curr_connected = nettools.get_connected_devices(
+        arp_devices = nettools.get_connected_devices(
             self.net_interface["address"], self.net_interface["mask"])
-        for connected in self.curr_connected:
+        self.curr_connected = []
+        for connected in arp_devices:
             found_device = self._find_device(connected)
             if found_device is None:
-                self.device_map.append({
+                new_device = {
                     "name": "UNNAMED",
                     "mac": connected["mac"],
                     "mac_vendor": connected["mac_vendor"],
                     "last_seen": connected["timestamp"]
-                })
+                }
+                self.device_map.append(new_device)
+                self.curr_connected.append(new_device)
             else:
                 found_device["last_seen"] = connected["timestamp"]
+                self.curr_connected.append(found_device)
 
     def _find_device(self, input_device):
         for device in self.device_map:
