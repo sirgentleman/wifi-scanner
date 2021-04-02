@@ -2,7 +2,7 @@
 
 import subprocess
 import nettoolbox as ntb
-import utils
+from . import utils
 import re
 import concurrent.futures
 import itertools
@@ -117,3 +117,7 @@ def get_connected_devices(machine_ip, mask="255.255.255.0"):
         })
 
     return return_devices
+
+
+def get_interfaces():
+    return ntb.get_interfaces()

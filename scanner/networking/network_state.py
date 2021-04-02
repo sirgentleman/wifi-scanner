@@ -1,6 +1,9 @@
-import nettools
+from . import nettools
+import os
 import csv
 import datetime
+
+MAP_FILE_PATH = os.path.join(os.path.expanduser("~"), "mapped_macs.csv")
 
 
 class NetworkState:
@@ -11,14 +14,17 @@ class NetworkState:
         self.field_names = ["name", "mac", "mac_vendor", "last_seen"]
 
     def save_map(self):
-        with open("mapped_macs.csv", newline='', mode="w") as mapfile:
+        with open(MAP_FILE_PATH, newline='', mode="w") as mapfile:
             writer = csv.DictWriter(mapfile, fieldnames=self.field_names)
             writer.writeheader()
             for device in self.device_map:
                 writer.writerow(device)
 
     def load_map(self):
-        with open("mapped_macs.csv", newline='', mode="r") as mapfile:
+        if not os.path.exists(MAP_FILE_PATH):
+            return
+
+        with open(MAP_FILE_PATH, newline='', mode="r") as mapfile:
             self.device_map = []
             reader = csv.DictReader(mapfile)
             for row in reader:
