@@ -1,7 +1,6 @@
-import nettoolbox as ntb
-from networking.network_state import NetworkState
-from mail.mail_service import MailService
-from config import *
+from .networking.network_state import NetworkState
+from .mail.mail_service import MailService
+from .config import *
 
 
 def main():

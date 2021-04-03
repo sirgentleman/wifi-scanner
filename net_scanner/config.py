@@ -1,5 +1,5 @@
 import os.path
-import networking.nettools as nt
+import net_scanner.networking.nettools as nt
 
 CFG_PATH = os.path.join(os.path.expanduser("~"), ".config", "net-scanner.conf")
 

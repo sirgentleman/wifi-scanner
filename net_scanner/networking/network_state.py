@@ -1,4 +1,5 @@
 from . import nettools
+from . import utils
 import os
 import csv
 import datetime
@@ -40,7 +41,7 @@ class NetworkState:
                 new_device = {
                     "name": "UNNAMED",
                     "mac": connected["mac"],
-                    "mac_vendor": connected["mac_vendor"],
+                    "mac_vendor": utils.get_vendor(connected["mac"]),
                     "last_seen": connected["timestamp"]
                 }
                 self.device_map.append(new_device)

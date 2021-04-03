@@ -2,7 +2,6 @@
 
 import subprocess
 import nettoolbox as ntb
-from . import utils
 import re
 import concurrent.futures
 import itertools
@@ -112,7 +111,6 @@ def get_connected_devices(machine_ip, mask="255.255.255.0"):
         return_devices.append({
             "ip": entry[0],
             "mac": entry[2],
-            "mac_vendor": utils.get_vendor(entry[2]),
             "timestamp": datetime.now().ctime()
         })
 

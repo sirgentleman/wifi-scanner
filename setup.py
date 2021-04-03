@@ -1,6 +1,10 @@
 from distutils.core import setup, Extension
 
 setup(
-    name='nettoolbox',
+    name='net_scanner',
     version='1.0',
-    ext_modules=[Extension('nettoolbox', ['scanner/networking/nettoolbox.c'])])
+    description='Network scanning utility.',
+    author='Błażej Ułanowicz',
+    license='Unlicense',
+    packages=['net_scanner', 'net_scanner.mail', 'net_scanner.networking'],
+    ext_modules=[Extension('nettoolbox', ['net_scanner/networking/nettoolbox.c'])])
